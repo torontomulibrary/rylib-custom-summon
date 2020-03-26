@@ -3,7 +3,6 @@
  * 
  * Modified to... just fix everything.
  **/
-$('head').append('<link rel="stylesheet" href="https://local.4libs.org/apps/summon/ShowJournal.css" type="text/css" />');
 
 /** 
  * Finds an h3 with text "Journal & Book" in the right pane, grabs it's 
@@ -18,14 +17,6 @@ $('div#rightPane div.customSections li h3[ng-bind="::section.title"]')
   .filter(function (index) { return $(this).text() == "Journal & Book" })
   .parent(".content")
   .css("display", "none");
-
-/** 
- * This forcibly unhides the first li in the customSections div. 
- * 
- * I'm not sure why they render it, then hide it via JS. Also, why do they use 
- * such a generic selector to hide it?
- **/
-$('div#rightPane div.customSections li').first().css("display", "block");
 
 setTimeout(function () {
   callAtoZ();
