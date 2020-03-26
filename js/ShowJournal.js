@@ -109,7 +109,7 @@ var successCallback = function (data) {
 
         var dbLine = "<div style='text-indent:15px'>";
         if (dbName && dbUrl) {
-          dbline += "<a target='_blank' href='" + dbUrl + "'>" + dbName + "</a>";
+          dbLine += "<a target='_blank' href='" + dbUrl + "'>" + dbName + "</a>";
         }
         else if (dbName) {
           dbName;
@@ -162,7 +162,6 @@ var successCallback = function (data) {
             dbLine += nbsp + "to present";
           }
         }
-
         dbLine += "</div>";
         bookContents += dbLine;
       }
