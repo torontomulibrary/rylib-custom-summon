@@ -1,8 +1,7 @@
 /** 
- * Modifications to the "Title Found Online" custom panel section by 
- * Ryerson University Library
+ * Modifications to "ShowJournal.js" by Ryerson University Library
  * 
- * Modified to prevent it from hiding the wrong boxes?
+ * Modified to... just fix everything.
  **/
 $('head').append('<link rel="stylesheet" href="https://local.4libs.org/apps/summon/ShowJournal.css" type="text/css" />');
 
@@ -12,6 +11,8 @@ $('head').append('<link rel="stylesheet" href="https://local.4libs.org/apps/summ
  * 
  * Why? I don't know. Why didn't the page just render with that li hidden in
  * the first place?
+ * 
+ * Also... I don't think that this li element even exists...
  **/
 $('div#rightPane div.customSections li h3[ng-bind="::section.title"]')
   .filter(function (index) { return $(this).text() == "Journal & Book" })
@@ -26,7 +27,6 @@ $('div#rightPane div.customSections li h3[ng-bind="::section.title"]')
  **/
 $('div#rightPane div.customSections li').first().css("display", "block");
 
-// TODO: fix this setTimeout() madness?
 setTimeout(function () {
   callAtoZ();
 }, 500);
@@ -34,25 +34,10 @@ setTimeout(function () {
 function callAtoZ() {
   // gets the ?q= query parameter from the current URL
   var currentQuery = getQueryParameter(location.href, "q");
-  var scripts = document.getElementsByTagName('script');
+  var libhash = getParam('libhash');
+  var baseUrl = "https://local.4libs.org/apps/summon/GetJournalAndBook.php";
 
-  // Finds the script src for ShowJournal.js
-  var myScript;
-  for (var i = 0; i < scripts.length; i++) {
-    if (scripts[i].src.search("ShowJournal.js") > 0) {
-      myScript = scripts[i].src;
-      break;
-    }
-  }
-
-  // Grabs everything after ? from the script src
-  var queryString = myScript.replace(/^[^\?]+\??/, '');
-
-  var params = parseQuery(queryString);
-  var libhash = params['libhash'];
-
-  var yql = "https://local.4libs.org/apps/summon/GetJournalAndBook.php?libhash=" + libhash + "&title=" + currentQuery;
-
+  var yql = baseUrl + "?libhash=" + libhash + "&title=" + currentQuery;
   $.ajax({
     type: 'GET',
     dataType: 'jsonp',
@@ -67,123 +52,45 @@ function callAtoZ() {
  * 
  * Moves the callback out of the ajax options to make the code readable.
  * Also fixes a bunch of terrible code in the original function.
- * Also removes a bunch of unused code in the original function.
+ * Also removes a bunch of unused/repeated code in the original function.
 */
 
 var successCallback = function (data) {
-  var number = Object.keys(data).length;
-  var journalContents = "";
-  var bookContents = "";
+  // generate journalsHTML
+  var journalsHTML = "";
+  if ( !onlyBook() ) {
+    var journalData = data.filter(function (i) { return i['format'] == 'journal'; });
+    journalsHTML += generateTitlesHTML(journalData);
+  }
 
-  for (var i = 0; i < number; i++) {
-    var title = data[i]['title'];
-    var pidentifer = data[i]['pidentifer'];
-    var eidentifer = data[i]['eidentifer'];
-    var format = data[i]['format'];
-    var nbsp = "&nbsp;";
-    var comma = ",";
-
-    if ((format == 'journal') && !onlyBook()) {
-      if (title) {
-        journalContents += "<span><b>" + title + "</b></span>";
-      }
-
-      if (pidentifer) {
-        journalContents += "<span>" + nbsp + pidentifer + "</span>";
-      }
-
-      if (eidentifer) {
-        if (pidentifer) {
-          journalContents += "<span>" + comma + nbsp + eidentifer + "</span>";
-        }
-        else {
-          journalContents += "<span>" + nbsp + eidentifer + "</span>";
-        }
-      }
-
-      for (var j = 0; j < data[i]['holdings']['dbname'].length; j++) {
-        var dbName = data[i]['holdings']['dbname'][j];
-        var dbUrl = data[i]['holdings']['url'][j];
-        var startDate = data[i]['holdings']['startdate'][j];
-        var endDate = data[i]['holdings']['enddate'][j];
-
-        var dbLine = "<div style='text-indent:15px'>";
-        if (dbName && dbUrl) {
-          dbLine += "<a target='_blank' href='" + dbUrl + "'>" + dbName + "</a>";
-        }
-        else if (dbName) {
-          dbName;
-        }
-
-        if (startDate) {
-          dbLine += nbsp + "from" + nbsp + startDate;
-          if (endDate) {
-            dbLine += nbsp + "to" + nbsp + endDate;
-          } else {
-            dbLine += nbsp + "to present";
-          }
-        }
-        dbLine += "</div>";
-        journalContents += dbLine;
-      }
-    } else if ((format == 'book') && !onlyJournal()) {
-      if (title) {
-        bookContents = bookContents + "<span><b>" + title + "</b></span>";
-      }
-      if (pidentifer) {
-        bookContents = bookContents + "<span>" + nbsp + pidentifer + "</span>";
-      }
-      if (eidentifer) {
-        if (pidentifer)
-          bookContents = bookContents + "<span>" + comma + nbsp + eidentifer + "</span>";
-        else
-          bookContents = bookContents + "<span>" + nbsp + eidentifer + "</span>";
-      }
-
-      for (var j = 0; j < data[i]['holdings']['dbname'].length; j++) {
-        var dbName = data[i]['holdings']['dbname'][j];
-        var dbUrl = data[i]['holdings']['url'][j];
-        var startDate = data[i]['holdings']['startdate'][j];
-        var endDate = data[i]['holdings']['enddate'][j];
-
-        var dbLine = "<div style='text-indent:15px'>";
-        if (dbName && dbUrl) {
-          dbLine += "<a target='_blank' href='" + dbUrl + "'>" + dbName + "</a>";
-        }
-        else if (dbName) {
-          dbLine += dbName;
-        }
-
-        if (startDate) {
-          dbLine += nbsp + "from" + nbsp + startDate;
-          if (endDate) {
-            dbLine += nbsp + "to" + nbsp + endDate;
-          } else {
-            dbLine += nbsp + "to present";
-          }
-        }
-        dbLine += "</div>";
-        bookContents += dbLine;
-      }
-    }
+  // generate booksHTML
+  var booksHTML = "";
+  if ( !onlyJournal() ) {
+    var bookData = data.filter(function (i) { return i['format'] == 'book'; });
+    booksHTML += generateTitlesHTML(bookData);
   }
 
   // Struture the HTML to be added to #mydiv < lol wtf
   var html = "<div>";
-  if (journalContents) {
+  if (journalsHTML.trim().length > 0) {
     html += "<a href='#' class='format'>Journal</a><br>";
-    html += journalContents;
+    html += journalsHTML;
     html += '<br>';
   }
-  if (bookContents) {
+  if (booksHTML.trim().length > 0) {
     html += "<a href='#' class='format'>Book</a><br>"
-    html += bookContents;
+    html += booksHTML;
   }
   html += "</div>";
 
   // This is actually stupid.
   $('div#mydiv').html(html);
 
+  /** 
+   * This is also pretty dumb. Why would you do this when you injected CSS at
+   * the beginning of this script?
+  */
+  // TODO: remove this garbage.
   $('.format').css({
     "background-color": "#29b6f6",
     "-moz-border-radius": "3px",
@@ -203,6 +110,86 @@ var successCallback = function (data) {
 }
 
 // Added by Ryerson University Library
+function generateTitlesHTML(data) {
+  html = "";
+  for (var i = 0; i < data.length; i++) {
+    var title = data[i]['title'];
+    var pidentifer = data[i]['pidentifer'];
+    var eidentifer = data[i]['eidentifer'];
+    html += generateHoldingsTitleHTML(title, pidentifer, eidentifer);
+    html += generateHoldingsHTML(data[i]['holdings']);
+  }
+  return html;
+}
+
+// Added by Ryerson University Library
+function generateHoldingsTitleHTML(title, pidentifer, eidentifer) {
+  var nbsp = "&nbsp;";
+  var comma = ",";
+
+  var html = '';
+  if (title) {
+    html += "<span><b>" + title + "</b></span> ";
+  }
+  if (pidentifer) {
+    html += "<span>" + pidentifer + "</span>";
+  }
+  if (eidentifer) {
+    if (pidentifer)
+      html += comma + nbsp + "<span>" + eidentifer + "</span>";
+    else
+      html += "<span>" + eidentifer + "</span>";
+  }
+  return html;
+}
+
+// Added by Ryerson University Library
+function generateHoldingsHTML(holdingsData) {
+  // This is dumb. But it's the way the data is structured so whatever.
+  var numHoldings = holdingsData['dbname'].length;
+
+  var html = "";
+  for (var j = 0; j < numHoldings; j++) {
+    var dbName = holdingsData['dbname'][j];
+    var dbUrl = holdingsData['url'][j];
+    var startDate = holdingsData['startdate'][j];
+    var endDate = holdingsData['enddate'][j];
+
+    var dbLine = "<div style='text-indent:15px'>";
+    if (dbName && dbUrl) {
+      dbLine += "<a target='_blank' href='" + dbUrl + "'>" + dbName + "</a>";
+    }
+    else if (dbName) {
+      dbLine += dbName;
+    }
+
+    dbLine += generateDateStringHTML(startDate, endDate)
+
+    dbLine += "</div>";
+    html += dbLine;
+  }
+
+  return html;
+}
+
+// Added by Ryerson University Library
+function generateDateStringHTML(startDate, endDate) {
+  var nbsp = "&nbsp;";
+
+  var html = '';
+  if (startDate) {
+    html += nbsp + "from" + nbsp + startDate;
+    if (endDate) {
+      html += nbsp + "to" + nbsp + endDate;
+    } else {
+      html += nbsp + "to present";
+    }
+  }
+  return html;
+}
+
+// Checks if the 'book' parameter is set
+// Added by Ryerson University Library
 function onlyBook() {
   var book = getParam('book');
   if (book !== undefined && book === 'true') {
@@ -211,6 +198,7 @@ function onlyBook() {
   return false;
 }
 
+// Checks if the 'journal' parameter is set
 // Added by Ryerson University Library
 function onlyJournal() {
   var journal = getParam('journal');
