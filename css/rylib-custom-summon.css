@@ -1,0 +1,60 @@
+body {
+  font-family: 'Replica-Regular', Verdana, Arial, sans-serif;
+}
+
+a {
+  text-decoration: underline;
+}
+
+.FilterGroup {
+  border-top: 1px solid #000;
+}
+
+/* No top border for the first FilterGroup "Refine Your Search" */
+.quickFilters.FilterGroup {
+  border: none;
+}
+
+.FilterGroup h3 {
+  font-size: 1.5rem;
+}
+
+.FilterGroup h3 a {
+  text-decoration: none;
+}
+
+.FilterGroup .values,
+.FilterGroup form[name="facetDatePicker"],
+.FilterGroup .time-presets {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+}
+
+/* Make Library chat icon more prominent */
+.uxf-icon.navChatIcon {
+  color: #ffae65!important;
+}
+
+.customSections {
+  margin-top: 0;
+}
+
+/* Injected Breadcrumb Styles */
+.rylib-breadcrumb {
+  list-style-type: none;
+  padding: 1.5rem 2rem;
+  margin: 0;
+}
+
+.rylib-breadcrumb li {
+  display: inline-block;
+}
+
+.rylib-breadcrumb li + li {
+  margin-left: 0.5rem;
+}
+
+.rylib-breadcrumb li + li:before {
+  content: "\00bb";
+  margin-right: 0.5rem; 
+}
