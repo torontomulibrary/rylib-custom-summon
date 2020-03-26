@@ -23,7 +23,7 @@ $('div#rightPane div.customSections li h3[ng-bind="::section.title"]')
  * 
  * I'm not sure why they render it, then hide it via JS. Also, why do they use 
  * such a generic selector to hide it?
- **/ 
+ **/
 $('div#rightPane div.customSections li').first().css("display", "block");
 
 // TODO: fix this setTimeout() madness?
@@ -58,7 +58,7 @@ function callAtoZ() {
     dataType: 'jsonp',
     crossDomain: true,
     url: yql,
-    success: successCallback    
+    success: successCallback
   });
 }
 
@@ -83,7 +83,7 @@ var successCallback = function (data) {
     var nbsp = "&nbsp;";
     var comma = ",";
 
-    if ( (format == 'journal') && !onlyBook() ) {
+    if ((format == 'journal') && !onlyBook()) {
       if (title) {
         journalContents += "<span><b>" + title + "</b></span>";
       }
@@ -104,20 +104,20 @@ var successCallback = function (data) {
       for (var j = 0; j < data[i]['holdings']['dbname'].length; j++) {
         var dbName = data[i]['holdings']['dbname'][j];
         var dbUrl = data[i]['holdings']['url'][j];
-        var startDate =  data[i]['holdings']['startdate'][j];
-        var endDate =  data[i]['holdings']['enddate'][j];
-        
+        var startDate = data[i]['holdings']['startdate'][j];
+        var endDate = data[i]['holdings']['enddate'][j];
+
         var dbLine = "<div style='text-indent:15px'>";
-        if ( dbName && dbUrl ) {
+        if (dbName && dbUrl) {
           dbline += "<a target='_blank' href='" + dbUrl + "'>" + dbName + "</a>";
         }
-        else if ( dbName ) {
+        else if (dbName) {
           dbName;
         }
 
-        if ( startDate ) {
+        if (startDate) {
           dbLine += nbsp + "from" + nbsp + startDate;
-          if ( endDate ) {
+          if (endDate) {
             dbLine += nbsp + "to" + nbsp + endDate;
           } else {
             dbLine += nbsp + "to present";
@@ -126,7 +126,7 @@ var successCallback = function (data) {
         dbLine += "</div>";
         journalContents += dbLine;
       }
-    } else if ( (format == 'book') && !onlyJournal() ) {
+    } else if ((format == 'book') && !onlyJournal()) {
       if (title) {
         bookContents = bookContents + "<span><b>" + title + "</b></span>";
       }
@@ -143,20 +143,20 @@ var successCallback = function (data) {
       for (var j = 0; j < data[i]['holdings']['dbname'].length; j++) {
         var dbName = data[i]['holdings']['dbname'][j];
         var dbUrl = data[i]['holdings']['url'][j];
-        var startDate =  data[i]['holdings']['startdate'][j];
-        var endDate =  data[i]['holdings']['enddate'][j];
+        var startDate = data[i]['holdings']['startdate'][j];
+        var endDate = data[i]['holdings']['enddate'][j];
 
         var dbLine = "<div style='text-indent:15px'>";
-        if ( dbName && dbUrl ) {
+        if (dbName && dbUrl) {
           dbLine += "<a target='_blank' href='" + dbUrl + "'>" + dbName + "</a>";
         }
-        else if ( dbName ) {
+        else if (dbName) {
           dbLine += dbName;
         }
 
-        if ( startDate ) {
+        if (startDate) {
           dbLine += nbsp + "from" + nbsp + startDate;
-          if ( endDate ) {
+          if (endDate) {
             dbLine += nbsp + "to" + nbsp + endDate;
           } else {
             dbLine += nbsp + "to present";
@@ -181,7 +181,7 @@ var successCallback = function (data) {
     html += bookContents;
   }
   html += "</div>";
-  
+
   // This is actually stupid.
   $('div#mydiv').html(html);
 
@@ -206,18 +206,18 @@ var successCallback = function (data) {
 // Added by Ryerson University Library
 function onlyBook() {
   var book = getParam('book');
-  if ( book !== undefined && book === 'true' ) {
+  if (book !== undefined && book === 'true') {
     return true;
-  } 
+  }
   return false;
 }
 
 // Added by Ryerson University Library
 function onlyJournal() {
   var journal = getParam('journal');
-  if ( journal !== undefined && journal === 'true' ) {
+  if (journal !== undefined && journal === 'true') {
     return true;
-  } 
+  }
   return false;
 }
 
@@ -235,7 +235,7 @@ function getParam(paramName) {
 
   // Grabs everything after ? from the script src
   var queryString = myScript.replace(/^[^\?]+\??/, '');
-  
+
   var params = parseQuery(queryString);
   return params[paramName];
 }
