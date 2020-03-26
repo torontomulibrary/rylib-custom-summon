@@ -4,25 +4,8 @@
  * Modified to... just fix everything.
  **/
 
-/** 
- * Finds an h3 with text "Journal & Book" in the right pane, grabs it's 
- * parent li (only if the li has the .content class), and hides said li.
- * 
- * Why? I don't know. Why didn't the page just render with that li hidden in
- * the first place?
- * 
- * Also... I don't think that this li element even exists...
- **/
-$('div#rightPane div.customSections li h3[ng-bind="::section.title"]')
-  .filter(function (index) { return $(this).text() == "Journal & Book" })
-  .parent(".content")
-  .css("display", "none");
-
+// Start the madness in 500ms...
 setTimeout(function () {
-  callAtoZ();
-}, 500);
-
-function callAtoZ() {
   // gets the ?q= query parameter from the current URL
   var currentQuery = getQueryParameter(location.href, "q");
   var libhash = getParam('libhash');
@@ -36,71 +19,50 @@ function callAtoZ() {
     url: yql,
     success: successCallback
   });
-}
+}, 500);
 
-/** 
- * Added by Ryerson University Library
- * 
- * Moves the callback out of the ajax options to make the code readable.
- * Also fixes a bunch of terrible code in the original function.
- * Also removes a bunch of unused/repeated code in the original function.
-*/
-
+// Added by Ryerson University Library
+// Moves the callback out of the ajax options to make the code readable.
 var successCallback = function (data) {
-  // generate journalsHTML
-  var journalsHTML = "";
+  // Build the HTML to be added to #mydiv < lol wtf
+  var html = '';
+
+  // our styles to inject
+  html += `<style>
+    .format {
+      background-color: #29b6f6;
+      border-radius: 3px;
+      display: inline-block;
+      cursor: pointer;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 5px 11px;
+      width: 100%;
+      text-decoration: none;
+    }
+  </style>`;
+
+  // the journal section, don't do this the script was called with ?book=true
   if ( !onlyBook() ) {
     var journalData = data.filter(function (i) { return i['format'] == 'journal'; });
-    journalsHTML += generateTitlesHTML(journalData);
+    html += "<a href='#' class='format'>Journal</a><br>";
+    html += generateTitlesHTML(journalData);
   }
 
-  // generate booksHTML
-  var booksHTML = "";
+  // the book section, don't do this the script was called with ?journal=true
   if ( !onlyJournal() ) {
     var bookData = data.filter(function (i) { return i['format'] == 'book'; });
-    booksHTML += generateTitlesHTML(bookData);
+    html += "<a href='#' class='format' style=\"margin-top: 12px\">Book</a><br>"
+    html += generateTitlesHTML(bookData);
   }
 
-  // Struture the HTML to be added to #mydiv < lol wtf
-  var html = "<div>";
-  if (journalsHTML.trim().length > 0) {
-    html += "<a href='#' class='format'>Journal</a><br>";
-    html += journalsHTML;
-    html += '<br>';
-  }
-  if (booksHTML.trim().length > 0) {
-    html += "<a href='#' class='format'>Book</a><br>"
-    html += booksHTML;
-  }
-  html += "</div>";
-
-  // This is actually stupid.
+  // This is a really stupid id.
   $('div#mydiv').html(html);
-
-  /** 
-   * This is also pretty dumb. Why would you do this when you injected CSS at
-   * the beginning of this script?
-  */
-  // TODO: remove this garbage.
-  $('.format').css({
-    "background-color": "#29b6f6",
-    "-moz-border-radius": "3px",
-    "-webkit-border-radius": "3px",
-    "border-radius": "3px",
-    "border": "0.3px solid  #e0e0e0 ",
-    "display": "inline-block",
-    "cursor": "pointer",
-    "color": "#ffffff",
-    "font-family": "Arial",
-    "font-size": "13px",
-    "font-weight": "bold",
-    "padding": "5px 11px",
-    "width": "100%",
-    "text-decoration": "none"
-  });
 }
 
 // Added by Ryerson University Library
+// HTML Helper function
 function generateTitlesHTML(data) {
   html = "";
   for (var i = 0; i < data.length; i++) {
@@ -114,6 +76,7 @@ function generateTitlesHTML(data) {
 }
 
 // Added by Ryerson University Library
+// HTML Helper function
 function generateHoldingsTitleHTML(title, pidentifer, eidentifer) {
   var nbsp = "&nbsp;";
   var comma = ",";
@@ -135,6 +98,7 @@ function generateHoldingsTitleHTML(title, pidentifer, eidentifer) {
 }
 
 // Added by Ryerson University Library
+// HTML Helper function
 function generateHoldingsHTML(holdingsData) {
   // This is dumb. But it's the way the data is structured so whatever.
   var numHoldings = holdingsData['dbname'].length;
@@ -164,6 +128,7 @@ function generateHoldingsHTML(holdingsData) {
 }
 
 // Added by Ryerson University Library
+// HTML Helper function
 function generateDateStringHTML(startDate, endDate) {
   var nbsp = "&nbsp;";
 
@@ -179,8 +144,8 @@ function generateDateStringHTML(startDate, endDate) {
   return html;
 }
 
-// Checks if the 'book' parameter is set
 // Added by Ryerson University Library
+// Checks if the 'book' parameter is set
 function onlyBook() {
   var book = getParam('book');
   if (book !== undefined && book === 'true') {
@@ -189,8 +154,8 @@ function onlyBook() {
   return false;
 }
 
-// Checks if the 'journal' parameter is set
 // Added by Ryerson University Library
+// Checks if the 'journal' parameter is set
 function onlyJournal() {
   var journal = getParam('journal');
   if (journal !== undefined && journal === 'true') {
@@ -200,6 +165,7 @@ function onlyJournal() {
 }
 
 // Added by Ryerson University Library
+// Moves this bit out of the callback function make the code readable.
 function getParam(paramName) {
   // Finds the script src for ShowJournal.js
   var scripts = document.getElementsByTagName('script');
