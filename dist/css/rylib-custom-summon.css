@@ -39,6 +39,10 @@ a {
   margin-top: 0;
 }
 
+.customSections h3 {
+  word-break: break-word;
+}
+
 /* Injected Breadcrumb Styles */
 .rylib-breadcrumb {
   list-style-type: none;

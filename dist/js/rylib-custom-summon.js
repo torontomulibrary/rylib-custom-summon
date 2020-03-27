@@ -23,7 +23,8 @@ setTimeout( function() {
 // It seems like we can just use straight jQuery?
 $(document).ready(function () {
   // Inject our custom styles
-  $('head').append('<link rel="stylesheet" type="text/css" href="https://ryersonlibrary.nyc3.digitaloceanspaces.com/rylib-custom-summon/css/rylib-custom-summon.css" />');
+  // Make sure this references ther right file!
+  $('head').append('<link rel="stylesheet" type="text/css" href="https://ryersonlibrary.nyc3.digitaloceanspaces.com/rylib-custom-summon/v0.0.x/css/rylib-custom-summon.css" />');
 
   // Temporary hard coded breadcrumb until I can figure out how to have it update dynamically
   // const title = "Search Everything";

@@ -17,13 +17,16 @@ setTimeout(function () {
     dataType: 'jsonp',
     crossDomain: true,
     url: yql,
-    success: successCallback
+    success: successCallback,
+    error: errorCallback,
   });
 }, 500);
 
 // Added by Ryerson University Library
 // Moves the callback out of the ajax options to make the code readable.
 var successCallback = function (data) {
+  console.log(data);
+
   // Build the HTML to be added to #mydiv < lol wtf
   var html = '';
 
@@ -59,6 +62,16 @@ var successCallback = function (data) {
 
   // This is a really stupid id.
   $('div#mydiv').html(html);
+  
+  // in case we hid it because it didn't show anything in a previous search
+  $(".customSections h3:contains('Title Found Online')").parent().show();
+}
+
+// Added by Ryerson University Library
+// Hides the "Title Found Online" custom panel if nothing is found
+// the PHP script that is called returns blanks which throws an error.
+var errorCallback = function(jqXHR, textStatus, errorThrown) {
+  $(".customSections h3:contains('Title Found Online')").parent().hide();
 }
 
 // Added by Ryerson University Library
