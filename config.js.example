@@ -1,0 +1,16 @@
+var config = {};
+
+config.doSpaces = {
+  endpoint: 'nyc3.digitaloceanspaces.com',
+  accessKeyId: 'YOUR DIGITALOCEAN SPACES ACCESS KEY ID',
+  secretAccessKey: 'YOUR DIGITALOCEAN SPACES SECRET ACCESS KEY',
+  defaultBucket: 'YOUR DIGITALOCEAN SPACES BUCKET',
+  defaultACL: 'public-read',
+}
+
+config.summon = {
+  ssClientCenterEmail : 'YOUR SERIALSSOLUTIONS LOGIN EMAIL',
+  ssClientCenterPassword : 'A SUPER SECURE PASSWORD',
+};
+
+module.exports = config;
