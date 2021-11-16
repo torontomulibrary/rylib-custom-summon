@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "aws-sdk": "^2.647.0",
+    "aws-sdk": "^2.814.0",
     "del": "^5.1.0",
     "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
